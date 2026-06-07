@@ -110,6 +110,8 @@ Objetivo: provar OIDC federado — o usuário entra com conta **Google** ou **Gi
 > Em sala, demonstramos **um** provedor (escolha Google **ou** GitHub). Os passos abaixo usam o Portal do Entra ID. A configuração exata de cada provedor externo pode evoluir no Portal; siga os rótulos atuais e os links oficiais que o próprio Portal exibe.
 
 1. Em **Microsoft Entra ID**, menu lateral → **External Identities → All identity providers** (ou **Identity providers**).
+
+> 💡 **Não confunda:** "External Identities" aqui é o **nome do blade** do Portal para **federar** provedores sociais (Google/GitHub) no seu tenant workforce — **não** é o produto "Entra External ID" (CIAM). Você segue sem nenhum tenant External ID, como dito no início desta página.
 2. Clique **`+ Google`** (ou **`+ GitHub`**).
 3. Cole o **Client ID** e o **Client secret** obtidos no console do provedor (Google Cloud Console / GitHub OAuth Apps).
 4. **`Save`**.

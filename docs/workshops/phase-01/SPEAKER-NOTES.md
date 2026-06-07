@@ -23,6 +23,8 @@
 
 **Pré-checagem (antes de começar):** confirme em voz alta "todo mundo rodou a migration `phase-01.sql`?" Quem não rodou, rode AGORA enquanto você abre o Bloco 1 (não pode chegar no Bloco 4 sem isso).
 
+> ⚠️ **Pré-condição BLOQUEANTE — Azure SQL Database (ADE-003):** confirme também "todo mundo está com a migration rodada num **Azure SQL Database**, não num SQL em VM?" As Functions Consumption **não estão em VNet** e **não alcançam** SQL em VM — quem estiver em VM **vai travar no Bloco 4** (consumer não conecta, timeout sem erro claro). Quem não tiver Azure SQL DB não pode seguir até resolver. Ver [PRE-WORKSHOP-CHECKLIST seção 1](../PRE-WORKSHOP-CHECKLIST.md).
+
 ---
 
 ## BLOCO 1 — Conceitos (50min · slides + Q&A)

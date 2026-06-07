@@ -13,6 +13,8 @@
 - Suas **iniciais** definidas (ex.: `jds` para João da Silva) — usamos em todos os nomes
 - Migration `phase-01.sql` já rodada (ver [README](./README.md) seção 8)
 
+> ⚠️ **BLOQUEANTE — Azure SQL Database (ADE-003):** antes de qualquer Step, confirme que sua camada de dados é um **Azure SQL Database** (`*.database.windows.net`), **não** SQL em VM. As Azure Functions em Consumption **não estão em VNet** e **não alcançam** SQL numa VM com IP privado — sem Azure SQL DB, o consumer do Bloco 4 **não conecta** e a F1 falha. Detalhes e validação no [PRE-WORKSHOP-CHECKLIST seção 1](../PRE-WORKSHOP-CHECKLIST.md#1-️-pré-condição-física-obrigatória--azure-sql-database-ade-003).
+
 > **Convenção de nomes (ADE-000 Inv 6):** substitua `<iniciais>` pelas suas e `<rand>` por 3 dígitos quaisquer. O **namespace é globalmente único** — se o nome já existir, troque os dígitos.
 
 | Recurso | Padrão de nome | Exemplo |
