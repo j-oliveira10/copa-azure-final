@@ -2,6 +2,7 @@ using Fifa2026.V2.Functions.Data;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 // .NET 8 isolated worker entrypoint.
 // ConfigureFunctionsWebApplication enables ASP.NET Core integration
@@ -25,6 +26,25 @@ var host = new HostBuilder()
         services.AddHttpClient<IN8nWebhookNotifier, N8nWebhookNotifier>(client =>
         {
             client.Timeout = TimeSpan.FromSeconds(10);
+        });
+    })
+    .ConfigureLogging(logging =>
+    {
+        // GOTCHA do isolated worker: AddApplicationInsightsTelemetryWorkerService aplica uma
+        // regra de filtro PADRÃO que limita o provider do Application Insights a Warning,
+        // descartando os logs Information do worker (nossos ILogger.LogInformation com
+        // BeginScope de OrderId/correlationId) ANTES de chegarem ao App Insights. O host.json
+        // controla o HOST, não esse filtro do worker — por isso os logs de aplicação não
+        // apareciam. Removemos a regra para que a telemetria de aplicação (rastreio ponta-a-
+        // ponta por correlationId/orderId) chegue ao App Insights.
+        logging.Services.Configure<LoggerFilterOptions>(options =>
+        {
+            var aiRule = options.Rules.FirstOrDefault(rule =>
+                rule.ProviderName == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+            if (aiRule is not null)
+            {
+                options.Rules.Remove(aiRule);
+            }
         });
     })
     .Build();
