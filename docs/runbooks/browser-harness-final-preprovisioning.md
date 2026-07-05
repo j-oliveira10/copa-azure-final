@@ -25,7 +25,7 @@ A decisão de arquitetura (plano §9.4) é **tirar a topologia complexa do reló
 |---|---|---|
 | **Rede** | VNet + **CAE VNet-integrado** (imutável) + **Private Endpoint do SQL** (`publicNetworkAccess: Disabled`) + DNS privado | ADE-009 Inv 3 (T2) |
 | **Cofre + identidade** | Key Vault `kv-dev-tk-cin-001` **[já existe]** _(HML de validação — na turma: `kv-<sufixo>`; ver §Nomenclatura)_ · **UA-MI compartilhada só-leitura** (`id-fifa2026-kv-reader` `[nome sugerido]`) · **system-assigned por-app** (SQL) | ADE-010 D1/D2 |
-| **Segredos semeados** | `gateway-admin-shared-secret` · `gemini-api-key` · `sql-connection-string` · `azure-signalr-connection-string` (execução única, offline) | ADE-010 D3 |
+| **Segredos semeados** | `gateway-admin-shared-secret` · `gemini-api-key` · `sql-connection-string` · `azure-signalr-connection-string` · `servicebus-connection-string` · `backend-sql-password` (execução única, offline) | ADE-010 D3 (v1.1) |
 | **Container Apps (wired ao cofre)** | `ca-mcp-<sufixo>` · `ca-gateway-<sufixo>` · `ca-flow-<sufixo>` **criados** lendo os app-secrets do Key Vault via KV reference + MI (revisão `Running`) — pré-req do Doctor **item 7**; o workflow só troca a imagem (AC-9) | Bloco 3 passo 5 / ADE-010 |
 | **Identidade do frontend** | 5 `VITE_*` de identidade (`VITE_CIAM_AUTHORITY`/`CLIENT_ID`, `VITE_ADMIN_TENANT_ID`/`CLIENT_ID`, `VITE_ADMIN_SCOPE`) semeadas no **App Settings** do `app-frontend-<sufixo>` — **não-secreto**, lidas pelo workflow (Bloco 4) | AC-6 / [AUTO-DECISION] |
 
@@ -106,6 +106,8 @@ Esta é a parte que **só o instrutor** faz, e **só uma vez** — porque envolv
    - `gemini-api-key`
    - `sql-connection-string`
    - `azure-signalr-connection-string`
+   - `servicebus-connection-string` (valor = o App Setting `ServiceBusConnection` **atual** da Function F1, byte-a-byte — a SAS `RootManageSharedAccessKey` herdada das Oitavas)
+   - `backend-sql-password` (valor = o App Setting `DB_PASSWORD` **atual** do backend v1, byte-a-byte — a senha discreta que o `database.js` lê)
 
    **Por que agora, offline:** valores de segredo **nunca** vão para o GitHub, arquivo ou log — só o instrutor os toca, no Portal/`az`, fora do relógio da aula. No **momento da semeadura** ninguém referencia esses secrets ainda → **risco zero** neste passo; o wiring dos apps para as KV references vem **logo a seguir**, ainda no pré-provisionamento (**passo 5**).
 
@@ -145,7 +147,7 @@ az webapp config appsettings set -g rg-<sufixo> -n app-frontend-<sufixo> --setti
 - [ ] **VNet + CAE VNet-integrado** existem; CAE **não** será recriado; FQDN base anotado.
 - [ ] **Private Endpoint do SQL** ativo; SQL `publicNetworkAccess: Disabled`; **resolve por DNS privado de dentro** da VNet, recusa de fora.
 - [ ] **`Key Vault Secrets Officer`** em você; **UA-MI `id-fifa2026-kv-reader`** criada com **`Key Vault Secrets User`** no cofre (propagação confirmada); system-assigned dos apps ligadas. _(Nomes: convenção `<prefixo>-<sufixo>` na turma — KV = `kv-<sufixo>`; MI = nome livre; ver §Nomenclatura.)_
-- [ ] **Secrets semeados** (`gateway-admin-shared-secret`, `gemini-api-key`, `sql-connection-string`, `azure-signalr-connection-string`), valor byte-a-byte (referenciados pelos apps no passo 5).
+- [ ] **Secrets semeados** (`gateway-admin-shared-secret`, `gemini-api-key`, `sql-connection-string`, `azure-signalr-connection-string`, `servicebus-connection-string`, `backend-sql-password`), valor byte-a-byte (referenciados pelos apps no passo 5).
 - [ ] **Container Apps criados e WIRED às KV references** (`ca-mcp-<sufixo>`/`ca-gateway-<sufixo>`/`ca-flow-<sufixo>` lendo app-secrets do cofre via MI, revisão `Running`) — pré-requisito do Doctor **item 7** (o workflow só troca a imagem, AC-9).
 - [ ] **5 `VITE_*` de identidade semeadas** no App Settings do `app-frontend-<sufixo>` (não-secreto) — pré-requisito do Doctor **item 8**; o `acao=frontend`/`tudo` do workflow as lê (fail-fast se faltar).
 - [ ] **FQDN estável** — nada mais recria a rede; as `VITE_*` de **URL** (FQDN) / CORS ficam para a aula.
